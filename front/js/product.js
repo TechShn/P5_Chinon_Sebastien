@@ -5,24 +5,29 @@ const id = url.searchParams.get('id');
 console.log(id);
 
 // Code pour demander uen requete à l'API
-fetch(`http://localhost:3000/api/products/${id}`)
-    .then(function(res) {
-        if (res.ok) {
-            return (res.json());
-        }
-    })
 
-    .then(function(product){
-            console.log(product)
-            addProduct(product)
-            createOption(product)
-            detailProduct(product)
-    })
+const initProduct = () => {
+    fetch(`http://localhost:3000/api/products/${id}`)
+        .then(function(res) {
+            if (res.ok) {
+                return (res.json());
+            }
+        })
 
-    .catch(function(err) {
-        
-    });
+        .then(function(product){
+            console.log('lol')
+                console.log(product)
+                addProduct(product)
+                console.log('mdr')
+                createOption(product)
+                console.log('ptdr')
+                addEventListenerToPanierBtn();
+        })
 
+        .catch(function(err) {
+            
+        });
+}
 //Code d'ajout des information du produit
 const addProduct = (product) => {
     let img = document.createElement('img') 
@@ -54,11 +59,37 @@ const createOption = (product) => {
 }
  
 
-const btn = document.getElementById('addToCart')
+const saveProduct = () => {
+    const colorId = document.getElementById('colors')
+    
+        const saveProduct = {
+            id: id,
+            quantity: quantity.value,
+            color: colorId.options[colorId.selectedIndex].value
+        }
+    console.log(saveProduct);
+    localStorage.setItem(saveProduct.id + ' - ' + saveProduct.color, JSON.stringify(saveProduct))
+    //localStorage.setItem(saveProduct.id, id)
+    //localStorage.setItem('quantity', quantity.value)
+    //localStorage.setItem(saveProduct.color, colorId.options[colorId.selectedIndex].value)
+
+}
+
+const addEventListenerToPanierBtn = () => {
+    const btn = document.getElementById('addToCart')
+    const qty = document.getElementById('quantity')
+    console.log(qty)
+
+    btn.addEventListener('click', saveProduct)
+
+}
+
+initProduct();
+
+/*const btn = document.getElementById('addToCart')
 const qty = document.getElementById('quantity')
 console.log(qty)
 
-for (let i = 0; i < btn; i++) {
 const save = () => {
     const colorId = document.getElementById('colors')
     
@@ -67,11 +98,15 @@ const save = () => {
         quantity: quantity.value,
         color: colorId.options[colorId.selectedIndex].value
     }
+console.log(saveProduct);
+localStorage.setItem(saveProduct.id + '' + saveProduct.color, JSON.stringify(saveProduct))
+}
 
-localStorage.setItem("saveProduct", JSON.stringify(saveProduct))
-}
 btn.addEventListener('click', save)
-}
+
+
+    
+/*btn.onclick  = localStorage.setItem('id', id)*/
 
 
 
