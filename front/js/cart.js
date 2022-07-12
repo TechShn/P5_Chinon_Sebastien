@@ -1,7 +1,11 @@
 
+/* Salut Charle */
 
+/*Voici la fonction fetch que je voulais utilier pour pouvoir faire une requete à l'API pour avoir toute les donnés des produit qui se trouvent dans le local Storage
+
+*/
 const initProduct = () => {
-    fetch(`http://localhost:3000/api/products/`)
+    fetch(`http://localhost:3000/api/products/`/*ici je pensait devoir mettre les id obtenue via la fonction getIdPanier, ce sont les id des produit qui se trouvent dans le localSorage */)
         .then(function(res) {
             if (res.ok) {
                 return (res.json());
@@ -22,36 +26,16 @@ const initProduct = () => {
 
 initProduct()
 
-
-/*const lol = (product) => {
-    console.log(document.querySelectorAll('.cart__item'))
-}
-
-console.log(lol());*/
-
-
-
-
-/*function allStorage() {
-
-    var values = [],
-        keys = Object.keys(localStorage),
-        i = keys.length;
-
-    while ( i-- ) {
-        values.push( JSON.parse(localStorage.getItem(keys[i]) ));
-    }
-
-    return values;
-}*/
-
+/* Ici c'est la fonction qui me permet d'obtenir la valeur de data-id (cart.html ligne 51) c'est dans la console les id sont ceux des produits qu'il y à dans le local
+Storage ce sont des attributs de la balise article,
+mais je quand j'appelle la fonction elle ne fonctionne pas, probleme d'initialisation */
 const  getIdPanier = (product) => {
     for(let i = 0; i < allStorages().length; i++) {
         console.log(document.querySelectorAll('.cart__item')[i].dataset.id) 
     }
 }
 
-
+//La fonction qui me permet de mettre les donné du locaStorage dans un tableau, c'est dans la console
 const allStorages = () => {
 
     let values = [];
@@ -65,33 +49,10 @@ const allStorages = () => {
     return values;
 }
 
+console.log(allStorages());
 
 
-
-
-
-
-//console.log(getId());
-//console.log(getColor(allStorages()));
-
-//console.log(localStorage.getItem(saveProduct.id + ' - ' + saveProduct.color));
-//console.log(localStorage.getItem(saveProduct.id));
-//console.log(localStorage.getItem('quantity'));
-//console.log(localStorage.getItem('color'));
-
-/*let saved = JSON.parse(localStorage.getItem('quantity'));
-let savedQty = JSON.parse(localStorage.getItem('quantity'))
-console.log(saved);
-console.log(savedQty);*/
-
-
-
-//Article et Div
-
-
-
-
-
+//La fonction qui me permet de créer les articles via le nombre de clé qu'il y à dans le localStorage , ça à l'air de fonctionner
 const getListPanier = (product) => {
     if (allStorages() != null) {
             for(let i = 0; i < allStorages().length; i++) {
@@ -175,3 +136,4 @@ const getListPanier = (product) => {
         
     }
 }
+/*En gros je n'arrive pas à ajouter les informations de l'API tel que l'image ou le prix ect.. dans les article que j'ai créée  */
