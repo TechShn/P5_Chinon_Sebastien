@@ -104,11 +104,3 @@ btn.addEventListener('click', save)
 
     
 /*btn.onclick  = localStorage.setItem('id', id)*/
-
-
-
-
-const lala = {
-    quantity: .quantity.value
-}
-console.log(lala);

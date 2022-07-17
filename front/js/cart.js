@@ -23,28 +23,6 @@ const storageId =  () => {
 console.log(storageId());
 
 
-/*const initProduct = () => {
-    fetch(`http://localhost:3000/api/products/`)
-        .then(function(res) {
-            if (res.ok) {
-                return (res.json());
-            }
-        })
-
-        .then(function(product){
-            console.log(product)
-            getListPanier(product)
-            //getIdPanier(product)
-            deletPanier(product)
-            
-        })
-
-        .catch(function(err) {
-            
-        });
-}
-initProduct()*/
-
 const initProduct = async () => {
     Promise.all(storageId().map(id => 
         fetch(`http://localhost:3000/api/products/${id}`)
@@ -177,39 +155,42 @@ const getListPanier =  (product) => {
         totalId.append(somme)
         return totalId
     }
-    
     console.log(totalQuantityProduct());
 
+
+
+
     
-    const soso = [];
+    const arrQuantity = [];
     for( let i = 0; i < product.length; i++) {
-        soso.push(product[i].price);
+        arrQuantity.push(product[i].price);
     }
         
-    
     let sum = 0
-    for(let i = 0; i < soso.length; i++) {
-        sum += soso[i]
+    for(let i = 0; i < arrQuantity.length; i++) {
+        sum += arrQuantity[i]
     }
 
     const totalPrice = document.getElementById('totalPrice')
     totalPrice.append(sum)
 
     const lala = document.querySelectorAll('.itemQuantity')
-    lala.forEach((value) => console.log(value));
+    console.log(lala);
+    lala.forEach((input) => console.log(input.value))
 
-    
+    /*const  quantityPanier = () => { 
+        let qty = []
+        allStorages().forEach((quantity) => qty.push(quantity.quantity = 0))
+        return qty
+    }
+    console.log(quantityPanier())*/
 }
 
 const deletPanier = (product) => {
     let btnSupp = document.querySelectorAll('.deleteItem');
-    console.log(btnSupp[2]);
-    let dataArticle = document.querySelectorAll('.cart__item')
-    console.log(dataArticle)
-
-    const turnGreen = () => {
-        btnSupp.style.background = 'green'
-    }
+    console.log(btnSupp);
+    /*let dataArticle = document.querySelectorAll('.cart__item')
+    console.log(dataArticle)*/
 
 
     btnSupp.forEach((element) => element.addEventListener('click', () => {
@@ -220,7 +201,11 @@ const deletPanier = (product) => {
 
         const localStorageCle = Object.keys(localStorage);
         localStorageCle.forEach((id) => console.log(id))
+        console.log(localStorageCle);
 
+        /*for(let i = 0; i < localStorageCle.length; i++) {
+            console.log(localStorageCle[i]);
+        }*/
         
         //localStorage.removeItem(nono)
     }))
@@ -244,5 +229,4 @@ console.log(nono);*/
 
 //nono.forEach((cle) => console.log(cle));
 
-console.log(allStorages());
-
+console.log(allStorages().quantity)
