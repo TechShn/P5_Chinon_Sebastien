@@ -1,232 +1,173 @@
-const allStorages = () => {
-    let values = [];
-    let  keys = Object.keys(localStorage);
-    
-    for (let i = 0; i < keys.length; i++) {
-        values.push( JSON.parse(localStorage.getItem(keys[i])))
-    }
+var products = [];
 
-    return values ;
-}
-console.log(allStorages());
-
-
-const storageId =  () => {
+function getIdsFromLS() {
     let arrStorageId = [];
-    
-    for(let i = 0; i < allStorages().length; i++) {
-        arrStorageId.push(allStorages()[i].id)
+
+    for (let i = 0; i < getProductsFromLS().length; i++) {
+        arrStorageId.push(getProductsFromLS()[i].id)
     }
 
     return arrStorageId;
 }
-console.log(storageId());
+
+function getProductsFromLS() {
+    let values = [];
+    let keys = Object.keys(localStorage);
+
+    for (let i = 0; i < keys.length; i++) {
+        values.push(JSON.parse(localStorage.getItem(keys[i])))
+    }
+
+    return values;
+}
 
 
-const initProduct = async () => {
-    Promise.all(storageId().map(id => 
+const initProducts = async () => {
+    Promise.all(getIdsFromLS().map(id =>
         fetch(`http://localhost:3000/api/products/${id}`)
-        .then(resp => resp.json())
-      ))
-
-      .then(function(product){
-        console.log(product)
-        getListPanier(product)
-        //getIdPanier(product)
-        deletPanier(product)
-        totalPriceProduct(product)
+            .then(resp => resp.json())
+    ))
+    .then(function (productsFromAPI) {
+        let products = mergeProductsFromAPIAndLS(productsFromAPI, getProductsFromLS());
+        console.log('products', products);
+        addProductsToDOM();
+        totalQuantityAndPriceProduct();
+        addEventListnersToDeleteButtons();
     })
 
-    .catch(function(err) {
-            
+    .catch(function (err) {
+        console.error("Impossible de récuper la liste des produits depuis l'API", err)
     });
 }
 
-initProduct()
-
-
-  
-/*const  getIdPanier = (product) => {
-    let datId = document.querySelectorAll('.cart__item')
-       
-    return datId
-}
-console.log(getIdPanier())*/
-
-
-const getListPanier =  (product) => {
-    if (allStorages() != null) {
-            for(let i = 0; i < allStorages().length; i++) {
-                const panierArticle = document.createElement('article');
-                const panierDivImg = document.createElement('div')
-                const panierDivContent = document.createElement('div')
-                const panierDivDescription = document.createElement('div')
-                const panierDivSetting = document.createElement('div')
-                const divSettingQuantity = document.createElement('div')
-                const divSettingDelete = document.createElement('div')
-
-                // Le reste
-                const itemImg = document.createElement('img');
-                const nameProduct = document.createElement('h2')
-                const colorProduct = document.createElement('p')
-                const priceProduct = document.createElement('p')
-                const quantityProduct = document.createElement('p')
-                const itemInput = document.createElement('input')
-                const delet = document.createElement('p')
-
-                //création des Div
-                //Set attribute
-                panierArticle.setAttribute('class','cart__item')
-                panierArticle.setAttribute('data-id', `${allStorages()[i].id}`)
-                panierArticle.setAttribute('data-color',`${allStorages()[i].color}`)
-
-                panierDivImg.setAttribute('class', 'cart__item__img')
-
-                panierDivContent.setAttribute('class', 'cart__item__content')
-
-                panierDivDescription.setAttribute('class', "cart__item__content__description")
-                panierDivSetting.setAttribute('class', 'cart__item__content__settings')
-
-                divSettingQuantity.setAttribute('class', 'cart__item__content__settings__quantity')
-                divSettingDelete.setAttribute('class','cart__item__content__settings__delete')
-
-                //Append Child
-                panierArticle.appendChild(panierDivImg)
-                panierArticle.appendChild(panierDivContent)
-
-                panierDivContent.appendChild(panierDivDescription)
-                panierDivContent.appendChild(panierDivSetting)
-
-                panierDivSetting.appendChild(divSettingQuantity)
-                panierDivSetting.appendChild(divSettingDelete)
-
-                //création interne des div
-                //set attribute et append
-                itemImg.setAttribute('src', product[i].imageUrl)
-                itemImg.setAttribute('alt', product[i].altTxt)
-
-                nameProduct.append(product[i].name)
-                colorProduct.append(`Couleur : ${allStorages()[i].color}`)
-                priceProduct.append(product[i].price + ' €')
-                quantityProduct.append('Qté : ')
-                itemInput.setAttribute('type', 'number')
-                itemInput.setAttribute('class', 'itemQuantity')
-                itemInput.setAttribute('name', 'itemQuantity')
-                itemInput.setAttribute('min', '1')
-                itemInput.setAttribute('max', '100')
-                itemInput.setAttribute('value', `${allStorages()[i].quantity}`)
-                delet.append('Supprimer')
-                delet.setAttribute('class', "deleteItem")
-
-                //append Child
-                panierDivImg.appendChild(itemImg)
-
-                panierDivDescription.appendChild(nameProduct)
-                panierDivDescription.appendChild(colorProduct)
-                panierDivDescription.appendChild(priceProduct)
-
-                divSettingQuantity.appendChild(quantityProduct)
-                divSettingQuantity.appendChild(itemInput)
-
-                divSettingDelete.appendChild(delet)
-                document.getElementById('cart__items').appendChild(panierArticle)
-
-               
-                
-            
-                
+function mergeProductsFromAPIAndLS(productsFromAPI, productsFromLS) {
+    productsFromLS.forEach(productFromLS => {
+        let productFromAPI = productsFromAPI.find(el => el._id == productFromLS.id);
+        if (productFromAPI) {
+            products.push({
+                quantity: parseInt(productFromLS.quantity),
+                color: productFromLS.color,
+                id: productFromLS.id,
+                price: productFromAPI.price,
+                imageUrl: productFromAPI.imageUrl,
+                altTxt: productFromAPI.altTxt,
+                name: productFromAPI.name,
+                description: productFromAPI.description
+            });
         }
         
-    }
-    const totalQuantityProduct = () => {
-        const sisi = [];
-        for( let i = 0; i < allStorages().length; i++) {
-            sisi.push(parseInt(allStorages()[i].quantity));
-        }
-        console.log((sisi));
-
-        let somme = 0
-        for(let i =0; i < sisi.length; i++) {
-            somme += sisi[i]
-        }
-        console.log(somme);
-
-        const totalId = document.getElementById('totalQuantity');
-        totalId.append(somme)
-        return totalId
-    }
-    console.log(totalQuantityProduct());
-
-
-
-
-    
-    const arrQuantity = [];
-    for( let i = 0; i < product.length; i++) {
-        arrQuantity.push(product[i].price);
-    }
-        
-    let sum = 0
-    for(let i = 0; i < arrQuantity.length; i++) {
-        sum += arrQuantity[i]
-    }
-
-    const totalPrice = document.getElementById('totalPrice')
-    totalPrice.append(sum)
-
-    const lala = document.querySelectorAll('.itemQuantity')
-    console.log(lala);
-    lala.forEach((input) => console.log(input.value))
-
-    /*const  quantityPanier = () => { 
-        let qty = []
-        allStorages().forEach((quantity) => qty.push(quantity.quantity = 0))
-        return qty
-    }
-    console.log(quantityPanier())*/
+    });
+    console.log('Merge', products);
 }
 
-const deletPanier = (product) => {
-    let btnSupp = document.querySelectorAll('.deleteItem');
-    console.log(btnSupp);
-    /*let dataArticle = document.querySelectorAll('.cart__item')
-    console.log(dataArticle)*/
+function addProductToDOM(product) {
+    const panierArticle = document.createElement('article');
+    const panierDivImg = document.createElement('div')
+    const panierDivContent = document.createElement('div')
+    const panierDivDescription = document.createElement('div')
+    const panierDivSetting = document.createElement('div')
+    const divSettingQuantity = document.createElement('div')
+    const divSettingDelete = document.createElement('div')
 
+    // Le reste
+    const itemImg = document.createElement('img');
+    const nameProduct = document.createElement('h2')
+    const colorProduct = document.createElement('p')
+    const priceProduct = document.createElement('p')
+    const quantityProduct = document.createElement('p')
+    const itemInput = document.createElement('input')
+    const delet = document.createElement('p')
 
-    btnSupp.forEach((element) => element.addEventListener('click', () => {
-        console.log(element)
-        element.style.background = 'green'
+    //création des Div
+    //Set attribute
+    panierArticle.setAttribute('class', 'cart__item')
+    panierArticle.setAttribute('data-id', `${product.id}`)
+    panierArticle.setAttribute('data-color', `${product.color}`)
 
-        console.log(btnSupp);
+    panierDivImg.setAttribute('class', 'cart__item__img')
 
-        const localStorageCle = Object.keys(localStorage);
-        localStorageCle.forEach((id) => console.log(id))
-        console.log(localStorageCle);
+    panierDivContent.setAttribute('class', 'cart__item__content')
 
-        /*for(let i = 0; i < localStorageCle.length; i++) {
-            console.log(localStorageCle[i]);
-        }*/
-        
-        //localStorage.removeItem(nono)
-    }))
+    panierDivDescription.setAttribute('class', "cart__item__content__description")
+    panierDivSetting.setAttribute('class', 'cart__item__content__settings')
 
+    divSettingQuantity.setAttribute('class', 'cart__item__content__settings__quantity')
+    divSettingDelete.setAttribute('class', 'cart__item__content__settings__delete')
 
+    //Append Child
+    panierArticle.appendChild(panierDivImg)
+    panierArticle.appendChild(panierDivContent)
 
-    /*const deletLocalStorage = () => {
+    panierDivContent.appendChild(panierDivDescription)
+    panierDivContent.appendChild(panierDivSetting)
 
-    }*/
+    panierDivSetting.appendChild(divSettingQuantity)
+    panierDivSetting.appendChild(divSettingDelete)
 
-    /*btnSupp.style.background = 'red'
+    //création interne des div
+    //set attribute et append
+    itemImg.setAttribute('src', product.imageUrl)
+    itemImg.setAttribute('alt', product.altTxt)
 
-    btnSupp.addEventListener('click', turnGreen )*/
-    
+    nameProduct.append(product.name)
+    colorProduct.append(`Couleur : ${product.color}`)
+    priceProduct.append(product.price + ' €')
+    quantityProduct.append('Qté : ')
+    itemInput.setAttribute('type', 'number')
+    itemInput.setAttribute('class', 'itemQuantity')
+    itemInput.setAttribute('name', 'itemQuantity')
+    itemInput.setAttribute('min', '1')
+    itemInput.setAttribute('max', '100')
+    itemInput.setAttribute('value', `${product.quantity}`)
+    delet.append('Supprimer')
+    delet.setAttribute('class', "deleteItem")
+
+    //append Child
+    panierDivImg.appendChild(itemImg)
+
+    panierDivDescription.appendChild(nameProduct)
+    panierDivDescription.appendChild(colorProduct)
+    panierDivDescription.appendChild(priceProduct)
+
+    divSettingQuantity.appendChild(quantityProduct)
+    divSettingQuantity.appendChild(itemInput)
+
+    divSettingDelete.appendChild(delet)
+    document.getElementById('cart__items').appendChild(panierArticle)
 }
 
+function addProductsToDOM() {
+    products.forEach(product => {
+        addProductToDOM(product);
+    })
+}
 
+function totalQuantityAndPriceProduct() {
+    let totalPrice = 0;
+    let totalQuantity = 0;
+    products.forEach(product => {
+        totalQuantity += product.quantity;
+        totalPrice += product.quantity * product.price;
+    });
+    console.log('Total price : ', totalPrice);
+    console.log('Total quantity', totalQuantity);
+    // TODO: Add it to DOM
+}
 
-/*const nono = Object.keys(localStorage);
-console.log(nono);*/
+function onClickDeleteProduct(event) {
+    let article = event.target.parentElement.parentElement.parentElement.parentElement;
 
-//nono.forEach((cle) => console.log(cle));
+    console.log('article :', article.getAttribute('data-id'), article.getAttribute('data-color'))
+    // Remove element from LS
+    // Remove element from products (liste enrichie)
+    totalQuantityAndPriceProduct();
+}
 
-console.log(allStorages().quantity)
+function addEventListnersToDeleteButtons() {
+    let btnSupps = document.querySelectorAll('.deleteItem');
+    btnSupps.forEach((element) => {
+        element.addEventListener('click', onClickDeleteProduct);
+    });
+}
+
+initProducts();
