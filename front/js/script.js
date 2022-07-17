@@ -40,10 +40,3 @@ const creatArticle = (product) => {
    document.getElementById('items').appendChild(newAnchor);
    newAnchor.appendChild(newArticle);
 }
- 
-
-
-
-
-
-

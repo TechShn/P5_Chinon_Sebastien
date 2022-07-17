@@ -1,11 +1,30 @@
+const allStorages = () => {
+    let values = [];
+    let  keys = Object.keys(localStorage);
+    
+    for (let i = 0; i < keys.length; i++) {
+        values.push( JSON.parse(localStorage.getItem(keys[i])))
+    }
 
-/* Salut Charle */
+    return values ;
+}
+console.log(allStorages());
 
-/*Voici la fonction fetch que je voulais utilier pour pouvoir faire une requete à l'API pour avoir toute les donnés des produit qui se trouvent dans le local Storage
 
-*/
-const initProduct = () => {
-    fetch(`http://localhost:3000/api/products/`/*ici je pensait devoir mettre les id obtenue via la fonction getIdPanier, ce sont les id des produit qui se trouvent dans le localSorage */)
+const storageId =  () => {
+    let arrStorageId = [];
+    
+    for(let i = 0; i < allStorages().length; i++) {
+        arrStorageId.push(allStorages()[i].id)
+    }
+
+    return arrStorageId;
+}
+console.log(storageId());
+
+
+/*const initProduct = () => {
+    fetch(`http://localhost:3000/api/products/`)
         .then(function(res) {
             if (res.ok) {
                 return (res.json());
@@ -13,47 +32,51 @@ const initProduct = () => {
         })
 
         .then(function(product){
-            console.log(product);
+            console.log(product)
             getListPanier(product)
-            getIdPanier(product)
-
+            //getIdPanier(product)
+            deletPanier(product)
+            
         })
 
         .catch(function(err) {
             
         });
 }
+initProduct()*/
+
+const initProduct = async () => {
+    Promise.all(storageId().map(id => 
+        fetch(`http://localhost:3000/api/products/${id}`)
+        .then(resp => resp.json())
+      ))
+
+      .then(function(product){
+        console.log(product)
+        getListPanier(product)
+        //getIdPanier(product)
+        deletPanier(product)
+        totalPriceProduct(product)
+    })
+
+    .catch(function(err) {
+            
+    });
+}
 
 initProduct()
 
-/* Ici c'est la fonction qui me permet d'obtenir la valeur de data-id (cart.html ligne 51) c'est dans la console les id sont ceux des produits qu'il y à dans le local
-Storage ce sont des attributs de la balise article,
-mais je quand j'appelle la fonction elle ne fonctionne pas, probleme d'initialisation */
-const  getIdPanier = (product) => {
-    for(let i = 0; i < allStorages().length; i++) {
-        console.log(document.querySelectorAll('.cart__item')[i].dataset.id) 
-    }
+
+  
+/*const  getIdPanier = (product) => {
+    let datId = document.querySelectorAll('.cart__item')
+       
+    return datId
 }
-
-//La fonction qui me permet de mettre les donné du locaStorage dans un tableau, c'est dans la console
-const allStorages = () => {
-
-    let values = [];
-    let  keys = Object.keys(localStorage);
-    let  i = keys.length;
-    
-    for (let i = 0; i < keys.length; i++) {
-        values.push( JSON.parse(localStorage.getItem(keys[i])) );
-    }
-
-    return values;
-}
-
-console.log(allStorages());
+console.log(getIdPanier())*/
 
 
-//La fonction qui me permet de créer les articles via le nombre de clé qu'il y à dans le localStorage , ça à l'air de fonctionner
-const getListPanier = (product) => {
+const getListPanier =  (product) => {
     if (allStorages() != null) {
             for(let i = 0; i < allStorages().length; i++) {
                 const panierArticle = document.createElement('article');
@@ -101,19 +124,19 @@ const getListPanier = (product) => {
 
                 //création interne des div
                 //set attribute et append
-                itemImg.setAttribute('alt', '../images/product01.jpg')
-                itemImg.setAttribute('alt', "Photographie d'un canapé")
+                itemImg.setAttribute('src', product[i].imageUrl)
+                itemImg.setAttribute('alt', product[i].altTxt)
 
-                nameProduct.append(product.name)
-                colorProduct.append('Vert')
-                priceProduct.append('42,00 €')
+                nameProduct.append(product[i].name)
+                colorProduct.append(`Couleur : ${allStorages()[i].color}`)
+                priceProduct.append(product[i].price + ' €')
                 quantityProduct.append('Qté : ')
                 itemInput.setAttribute('type', 'number')
                 itemInput.setAttribute('class', 'itemQuantity')
                 itemInput.setAttribute('name', 'itemQuantity')
                 itemInput.setAttribute('min', '1')
                 itemInput.setAttribute('max', '100')
-                itemInput.setAttribute('value', '42')
+                itemInput.setAttribute('value', `${allStorages()[i].quantity}`)
                 delet.append('Supprimer')
                 delet.setAttribute('class', "deleteItem")
 
@@ -130,10 +153,96 @@ const getListPanier = (product) => {
                 divSettingDelete.appendChild(delet)
                 document.getElementById('cart__items').appendChild(panierArticle)
 
-                //const panierId = document.querySelectorAll('.cart__item')[i].dataset.id
-                //console.log(panierId);
+               
+                
+            
+                
         }
         
     }
+    const totalQuantityProduct = () => {
+        const sisi = [];
+        for( let i = 0; i < allStorages().length; i++) {
+            sisi.push(parseInt(allStorages()[i].quantity));
+        }
+        console.log((sisi));
+
+        let somme = 0
+        for(let i =0; i < sisi.length; i++) {
+            somme += sisi[i]
+        }
+        console.log(somme);
+
+        const totalId = document.getElementById('totalQuantity');
+        totalId.append(somme)
+        return totalId
+    }
+    
+    console.log(totalQuantityProduct());
+
+    
+    const soso = [];
+    for( let i = 0; i < product.length; i++) {
+        soso.push(product[i].price);
+    }
+        
+    
+    let sum = 0
+    for(let i = 0; i < soso.length; i++) {
+        sum += soso[i]
+    }
+
+    const totalPrice = document.getElementById('totalPrice')
+    totalPrice.append(sum)
+
+    const lala = document.querySelectorAll('.itemQuantity')
+    lala.forEach((value) => console.log(value));
+
+    
 }
-/*En gros je n'arrive pas à ajouter les informations de l'API tel que l'image ou le prix ect.. dans les article que j'ai créée  */
+
+const deletPanier = (product) => {
+    let btnSupp = document.querySelectorAll('.deleteItem');
+    console.log(btnSupp[2]);
+    let dataArticle = document.querySelectorAll('.cart__item')
+    console.log(dataArticle)
+
+    const turnGreen = () => {
+        btnSupp.style.background = 'green'
+    }
+
+
+    btnSupp.forEach((element) => element.addEventListener('click', () => {
+        console.log(element)
+        element.style.background = 'green'
+
+        console.log(btnSupp);
+
+        const localStorageCle = Object.keys(localStorage);
+        localStorageCle.forEach((id) => console.log(id))
+
+        
+        //localStorage.removeItem(nono)
+    }))
+
+
+
+    /*const deletLocalStorage = () => {
+
+    }*/
+
+    /*btnSupp.style.background = 'red'
+
+    btnSupp.addEventListener('click', turnGreen )*/
+    
+}
+
+
+
+/*const nono = Object.keys(localStorage);
+console.log(nono);*/
+
+//nono.forEach((cle) => console.log(cle));
+
+console.log(allStorages());
+

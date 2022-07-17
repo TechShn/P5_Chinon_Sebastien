@@ -15,12 +15,9 @@ const initProduct = () => {
         })
 
         .then(function(product){
-            console.log('lol')
                 console.log(product)
                 addProduct(product)
-                console.log('mdr')
                 createOption(product)
-                console.log('ptdr')
                 addEventListenerToPanierBtn();
         })
 
@@ -65,7 +62,7 @@ const saveProduct = () => {
         const saveProduct = {
             id: id,
             quantity: quantity.value,
-            color: colorId.options[colorId.selectedIndex].value
+            color: colorId.options[colorId.selectedIndex].value,
         }
     console.log(saveProduct);
     localStorage.setItem(saveProduct.id + ' - ' + saveProduct.color, JSON.stringify(saveProduct))
@@ -111,3 +108,7 @@ btn.addEventListener('click', save)
 
 
 
+const lala = {
+    quantity: .quantity.value
+}
+console.log(lala);
