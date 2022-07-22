@@ -1,6 +1,8 @@
+// Variable possedant la liste des produits provenant de l'API et des produit du localStorage
 let products = [];
 console.log(products);
 
+// Fonction permetant d'obtenir un tableau des IDs des produits du localStorage 
 function getIdsFromLS() {
     let arrGetIdFromLS = [];
 
@@ -10,7 +12,7 @@ function getIdsFromLS() {
 
     return arrGetIdFromLS;
 }
-
+// Fonction permetant d'obtenir un tableau des produit du localStorage
 function getProductsFromLS() {
     let values = [];
     let keys = Object.keys(localStorage);
@@ -23,7 +25,7 @@ function getProductsFromLS() {
 }
 
 
-
+// Fonction permetant de faire une requete à l'API afin d'obtenir les differents produits selectionnés par leur IDs
 const initProducts = async () => {
     Promise.all(getIdsFromLS().map(id =>
         fetch(`http://localhost:3000/api/products/${id}`)
@@ -35,7 +37,9 @@ const initProducts = async () => {
         addProductsToDOM();
         totalQuantityAndPriceProduct();
         addEventListnersToDeleteButtons();
-        inputQuantity();
+        addEventListenertoModifInput();
+        addEventListenerToVerifieInputFirstName();
+        //inputQuantity();
     })
 
     .catch(function (err) {
@@ -43,6 +47,7 @@ const initProducts = async () => {
     });
 }
 
+//Fonction permetant d'avoir un tableau possedant les informations des produits de l'API et les informations des produits du LocalStorage
 function mergeProductsFromAPIAndLS(productsFromAPI, productsFromLS) {
     productsFromLS.forEach(productFromLS => {
         let productFromAPI = productsFromAPI.find(el => el._id == productFromLS.id);
@@ -63,6 +68,7 @@ function mergeProductsFromAPIAndLS(productsFromAPI, productsFromLS) {
     console.log('Merge', products);
 }
 
+// Fonction permetant de créer un article possedant les information du produit et l'ajouter dans le DOM
 function addProductToDOM(product) {
     const panierArticle = document.createElement('article');
     const panierDivImg = document.createElement('div')
@@ -139,6 +145,7 @@ function addProductToDOM(product) {
     document.getElementById('cart__items').appendChild(panierArticle)
 }
 
+// Fonction permetant d'ajouter tout les produit de l'API dans le DOM
 function addProductsToDOM() {
     products.forEach(product => {
         addProductToDOM(product);
@@ -152,8 +159,6 @@ function totalQuantityAndPriceProduct() {
         totalQuantity += product.quantity;
         totalPrice += product.quantity * product.price;
     });
-    console.log('Total price : ', totalPrice);
-    console.log('Total quantity', totalQuantity);
 
     let addTotalQuantityToDom = document.getElementById('totalQuantity')
     let addTotalPriceToDom = document.getElementById('totalPrice')
@@ -163,19 +168,18 @@ function totalQuantityAndPriceProduct() {
     
 }
 
+// Fonctions permettant de supprimer les differentes cle selectionné via leur data, du localStorage
 function onClickDeleteProduct(event) {
     let article = event.target.parentElement.parentElement.parentElement.parentElement;
 
-    console.log(article);
-
     let data = article.getAttribute('data-id')+ ' - ' + article.getAttribute('data-color')
-    console.log(data);
+  
     // Remove element from LS
-    //localStorage.removeItem(data)
+    localStorage.removeItem(data)
     // Remove element from products (liste enrichie)
     //totalQuantityAndPriceProduct();
     //console.log(totalQuantityAndPriceProduct());
-    //location.reload();
+    location.reload();
 }
 
 function addEventListnersToDeleteButtons() {
@@ -186,47 +190,50 @@ function addEventListnersToDeleteButtons() {
 }
 
 
-function inputQuantity() {
-    let inputQté = document.querySelectorAll('.itemQuantity');
-    inputQté.forEach((input) =>{ 
+function addEventListenertoModifInput () {
+    let inputNumber = document.querySelectorAll('.itemQuantity');
+     inputNumber.forEach((input) => {
+        input.addEventListener('focusout', () => {
+            let parentInput =  input.parentNode.parentNode.parentNode.parentNode
+            let dataInput = parentInput.getAttribute('data-id')+ ' - ' + parentInput.getAttribute('data-color');
+            let valInput = input.value;
 
-        let valInput = input.value
-        input.style.background = 'red'
-        let parentInput =  input.parentNode.parentNode.parentNode.parentNode
-        let dataInput = parentInput.getAttribute('data-id')+ ' - ' + parentInput.getAttribute('data-color');
-        /*const saveProduct = {
-            id: id,
-            quantity: valInput,
-            color: colorId.options[colorId.selectedIndex].value,
-        }*/
+            const saveProduct = {
+                id: parentInput.getAttribute('data-id'),
+                quantity: valInput,
+                color: parentInput.getAttribute('data-color'),
+            }
 
-        const saveProduct = {
-            id: getProductsFromLS()[1].id,
-            quantity: valInput,
-            color: 'colorId.options[colorId.selectedIndex].value',
-        }
-        console.log(saveProduct.quantity);
-        
-
-        
-        console.log(parentInput);
-        console.log(valInput);
-        console.log(dataInput);
-        
-        if(valInput) {
-            input.style.background ='green'
-            //input.value = saveProduct.quantity
-            
-            //console.log(localStorage.setItem(dataInput, JSON.stringify(saveProduct)))
-            //location.reload();
-        }
-    });
-    let quantityFromLS = getProductsFromLS().forEach((element) => console.log(element.quantity))
-    console.log(quantityFromLS);
-    console.log(inputQté);
-
-
+            if(valInput) {
+                input.setAttribute('value', input.value);
+                console.log(localStorage.setItem(dataInput, JSON.stringify(saveProduct)))
+            }
+            location.reload();
+        })
+     })
 }
+
 
 initProducts();
 
+
+function FormulaireFirstNameFocusout (event) {
+    let valueFirstName = event.target.value;
+        const errMsgFirstName = document.getElementById('firstNameErrorMsg')
+        const regexFirstName = /^[A-Z][a-z]/.test(valueFirstName);
+        
+        if(regexFirstName === true) {
+            errMsgFirstName.style.display = 'none'
+            event.target.style.border ='none';
+        } else {
+            event.target.style.border ='2px solid red';
+            errMsgFirstName.style.display = 'contents'
+            errMsgFirstName.textContent = "Ceci n'est pas un nom.    (exemple: Sébastien)"
+        }
+
+}
+
+function addEventListenerToVerifieInputFirstName () {
+    const inputFirstName = document.getElementById('firstName')
+    inputFirstName.addEventListener('focusout', FormulaireFirstNameFocusout)
+}
