@@ -1,13 +1,14 @@
-var products = [];
+let products = [];
+console.log(products);
 
 function getIdsFromLS() {
-    let arrStorageId = [];
+    let arrGetIdFromLS = [];
 
     for (let i = 0; i < getProductsFromLS().length; i++) {
-        arrStorageId.push(getProductsFromLS()[i].id)
+        arrGetIdFromLS.push(getProductsFromLS()[i].id)
     }
 
-    return arrStorageId;
+    return arrGetIdFromLS;
 }
 
 function getProductsFromLS() {
@@ -22,6 +23,7 @@ function getProductsFromLS() {
 }
 
 
+
 const initProducts = async () => {
     Promise.all(getIdsFromLS().map(id =>
         fetch(`http://localhost:3000/api/products/${id}`)
@@ -33,6 +35,7 @@ const initProducts = async () => {
         addProductsToDOM();
         totalQuantityAndPriceProduct();
         addEventListnersToDeleteButtons();
+        inputQuantity();
     })
 
     .catch(function (err) {
@@ -151,16 +154,28 @@ function totalQuantityAndPriceProduct() {
     });
     console.log('Total price : ', totalPrice);
     console.log('Total quantity', totalQuantity);
-    // TODO: Add it to DOM
+
+    let addTotalQuantityToDom = document.getElementById('totalQuantity')
+    let addTotalPriceToDom = document.getElementById('totalPrice')
+
+    addTotalQuantityToDom.append(totalQuantity)
+    addTotalPriceToDom.append(totalPrice)
+    
 }
 
 function onClickDeleteProduct(event) {
     let article = event.target.parentElement.parentElement.parentElement.parentElement;
 
-    console.log('article :', article.getAttribute('data-id'), article.getAttribute('data-color'))
+    console.log(article);
+
+    let data = article.getAttribute('data-id')+ ' - ' + article.getAttribute('data-color')
+    console.log(data);
     // Remove element from LS
+    //localStorage.removeItem(data)
     // Remove element from products (liste enrichie)
-    totalQuantityAndPriceProduct();
+    //totalQuantityAndPriceProduct();
+    //console.log(totalQuantityAndPriceProduct());
+    //location.reload();
 }
 
 function addEventListnersToDeleteButtons() {
@@ -170,4 +185,48 @@ function addEventListnersToDeleteButtons() {
     });
 }
 
+
+function inputQuantity() {
+    let inputQté = document.querySelectorAll('.itemQuantity');
+    inputQté.forEach((input) =>{ 
+
+        let valInput = input.value
+        input.style.background = 'red'
+        let parentInput =  input.parentNode.parentNode.parentNode.parentNode
+        let dataInput = parentInput.getAttribute('data-id')+ ' - ' + parentInput.getAttribute('data-color');
+        /*const saveProduct = {
+            id: id,
+            quantity: valInput,
+            color: colorId.options[colorId.selectedIndex].value,
+        }*/
+
+        const saveProduct = {
+            id: getProductsFromLS()[1].id,
+            quantity: valInput,
+            color: 'colorId.options[colorId.selectedIndex].value',
+        }
+        console.log(saveProduct.quantity);
+        
+
+        
+        console.log(parentInput);
+        console.log(valInput);
+        console.log(dataInput);
+        
+        if(valInput) {
+            input.style.background ='green'
+            //input.value = saveProduct.quantity
+            
+            //console.log(localStorage.setItem(dataInput, JSON.stringify(saveProduct)))
+            //location.reload();
+        }
+    });
+    let quantityFromLS = getProductsFromLS().forEach((element) => console.log(element.quantity))
+    console.log(quantityFromLS);
+    console.log(inputQté);
+
+
+}
+
 initProducts();
+
