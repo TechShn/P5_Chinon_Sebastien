@@ -75,27 +75,27 @@
             </div>
             <div class="cart__order">
               <form method="get" class="cart__order__form">
-                <div class="cart__order__form__question" data-color="rouge">
+                <div class="cart__order__form__question">
                   <label for="firstName">Prénom: </label>
-                  <input type="text" name="firstName" id="firstName" required>
+                  <input type="text" name="firstName" id="firstName">
                   <p id="firstNameErrorMsg"><!-- ci est un message d'erreur --></p>
                 </div>
-                <div class="cart__order__form__question" data-color="jaune">
+                <div class="cart__order__form__question">
                   <label for="lastName">Nom: </label>
                   <input type="text" name="lastName" id="lastName" required>
                   <p id="lastNameErrorMsg"></p>
                 </div>
-                <div class="cart__order__form__question" data-color="vert">
+                <div class="cart__order__form__question">
                   <label for="address">Adresse: </label>
                   <input type="text" name="address" id="address" required>
                   <p id="addressErrorMsg"></p>
                 </div>
-                <div class="cart__order__form__question" data-color="violet">
+                <div class="cart__order__form__question">
                   <label for="city">Ville: </label>
                   <input type="text" name="city" id="city" required>
                   <p id="cityErrorMsg"></p>
                 </div>
-                <div class="cart__order__form__question" data-color="bleu">
+                <div class="cart__order__form__question">
                   <label for="email">Email: </label>
                   <input type="email" name="email" id="email" required>
                   <p id="emailErrorMsg"></p>
@@ -135,4 +135,5 @@
     </footer>
   <script src="../js/cart.js"></script>
   </body>
+  <input type="number" class="itemQuantit" name="itemQuantity" min="1" max="100" value="42">
 </html>

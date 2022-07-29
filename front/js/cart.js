@@ -25,11 +25,11 @@ function getProductsFromLS() {
 }
 
 
-// Fonction permetant de faire une requete à l'API afin d'obtenir les differents produits selectionnés par leur IDs
+// Fonction permetant de faire une requete à l'API avec plusieurs URL different afin d'obtenir les differents produits selectionnés par leur IDs
 const initProducts = async () => {
     Promise.all(getIdsFromLS().map(id =>
         fetch(`http://localhost:3000/api/products/${id}`)
-            .then(resp => resp.json())
+            .then(res => res.json())
     ))
     .then(function (productsFromAPI) {
         let products = mergeProductsFromAPIAndLS(productsFromAPI, getProductsFromLS());
@@ -39,7 +39,11 @@ const initProducts = async () => {
         addEventListnersToDeleteButtons();
         addEventListenertoModifInput();
         addEventListenerToVerifieInputFirstName();
-        //inputQuantity();
+        addEventListenerToVerifieInputLastName();
+        addEventListenerToVerifieInputAdress();
+        addEventListenerToVerifieInputCity();
+        addEventListenerToVerifieInputEmail();
+        addEventListenerToSendInformation();
     })
 
     .catch(function (err) {
@@ -171,14 +175,9 @@ function totalQuantityAndPriceProduct() {
 // Fonctions permettant de supprimer les differentes cle selectionné via leur data, du localStorage
 function onClickDeleteProduct(event) {
     let article = event.target.parentElement.parentElement.parentElement.parentElement;
-
     let data = article.getAttribute('data-id')+ ' - ' + article.getAttribute('data-color')
-  
-    // Remove element from LS
+
     localStorage.removeItem(data)
-    // Remove element from products (liste enrichie)
-    //totalQuantityAndPriceProduct();
-    //console.log(totalQuantityAndPriceProduct());
     location.reload();
 }
 
@@ -189,18 +188,18 @@ function addEventListnersToDeleteButtons() {
     });
 }
 
-
+//Fonction permettant de modifier la quantité du produit dans la page et le LocalStorage
 function addEventListenertoModifInput () {
     let inputNumber = document.querySelectorAll('.itemQuantity');
      inputNumber.forEach((input) => {
-        input.addEventListener('focusout', () => {
+        input.addEventListener('change', () => {
             let parentInput =  input.parentNode.parentNode.parentNode.parentNode
             let dataInput = parentInput.getAttribute('data-id')+ ' - ' + parentInput.getAttribute('data-color');
             let valInput = input.value;
 
             const saveProduct = {
                 id: parentInput.getAttribute('data-id'),
-                quantity: valInput,
+                quantity: +valInput,
                 color: parentInput.getAttribute('data-color'),
             }
 
@@ -208,32 +207,177 @@ function addEventListenertoModifInput () {
                 input.setAttribute('value', input.value);
                 console.log(localStorage.setItem(dataInput, JSON.stringify(saveProduct)))
             }
-            location.reload();
         })
      })
 }
 
-
 initProducts();
 
-
-function FormulaireFirstNameFocusout (event) {
-    let valueFirstName = event.target.value;
+// Fonctions permettant de valider les informations dans le formulaire
+function isFirstNameValid () {
+    const inputFirstName = document.getElementById('firstName');
         const errMsgFirstName = document.getElementById('firstNameErrorMsg')
-        const regexFirstName = /^[A-Z][a-z]/.test(valueFirstName);
+        const regexFirstName = /^[A-Z][a-z]/.test(inputFirstName.value);
         
         if(regexFirstName === true) {
             errMsgFirstName.style.display = 'none'
-            event.target.style.border ='none';
+            inputFirstName.style.border ='none';
+            return true
         } else {
-            event.target.style.border ='2px solid red';
+            inputFirstName.style.border ='2px solid red';
             errMsgFirstName.style.display = 'contents'
             errMsgFirstName.textContent = "Ceci n'est pas un nom.    (exemple: Sébastien)"
+            return false
         }
-
 }
 
 function addEventListenerToVerifieInputFirstName () {
     const inputFirstName = document.getElementById('firstName')
-    inputFirstName.addEventListener('focusout', FormulaireFirstNameFocusout)
+    inputFirstName.addEventListener('change', isFirstNameValid)
 }
+
+
+function isLastNameValid () {
+    const inputLastName = document.getElementById('lastName');
+        const errMsgLastName = document.getElementById('lastNameErrorMsg')
+        const regexLastName = /^[A-Z][a-z]/.test(inputLastName.value);
+        
+        if(regexLastName === true) {
+            errMsgLastName.style.display = 'none'
+            inputLastName.style.border ='none';
+            return true
+        } else {
+            inputLastName.style.border ='2px solid red';
+            errMsgLastName.style.display = 'contents'
+            errMsgLastName.textContent = "Ceci n'est pas un prénom.    (exemple: Chinon)"
+            return false
+        }
+}
+
+function addEventListenerToVerifieInputLastName () {
+    const inputLastName = document.getElementById('lastName')
+    inputLastName.addEventListener('change', isLastNameValid)
+}
+
+
+function isAdressValid () {
+    const inputAddress = document.getElementById('address');
+        const errMsgAdress = document.getElementById('addressErrorMsg')
+        const regexAdress = /^[0-9]+[ |[a-zà-ú.,-]/.test(inputAddress.value);
+        
+        if(regexAdress === true) {
+            errMsgAdress.style.display = 'none'
+            inputAddress.style.border ='none';
+            return true
+        } else {
+            inputAddress.style.border ='2px solid red';
+            errMsgAdress.style.display = 'contents'
+            errMsgAdress.textContent = "Ceci n'est pas une adresse.    (exemple: 80 Avenue de la division Leclerc)"
+            return false
+        }
+}
+
+function addEventListenerToVerifieInputAdress () {
+    const inputLastName = document.getElementById('address')
+    inputLastName.addEventListener('change', isAdressValid)
+}
+
+
+function isCityValid () {
+    const inputCity = document.getElementById('city');
+        const errMsgCity = document.getElementById('cityErrorMsg')
+        const regexCity = /^[A-Z][a-z]+(?:[\s-][a-zA-Z]+)*$/.test(inputCity.value);
+        
+        if(regexCity === true) {
+            errMsgCity.style.display = 'none'
+            inputCity.style.border ='none';
+            return true
+        } else {
+            inputCity.style.border ='2px solid red';
+            errMsgCity.style.display = 'contents'
+            errMsgCity.textContent = "Ceci n'est pas le nom d'une ville.    (exemple: Paris ou Garges-Les-Gonesse)"
+            return false
+        }
+}
+
+function addEventListenerToVerifieInputCity () {
+    const inputCity = document.getElementById('city')
+    inputCity.addEventListener('change', isCityValid)
+}
+
+
+function isEmailValid () {
+    const inputEmail = document.getElementById('email');
+        const errMsgEmail = document.getElementById('emailErrorMsg')
+        const regexEmail = /[^@]+@.+\.\w{2,3}$/.test(inputEmail.value);
+        
+        if(regexEmail === true) {
+            errMsgEmail.style.display = 'none'
+            inputEmail.style.border ='none';
+            return true
+        } else {
+            inputEmail.style.border ='2px solid red';
+            errMsgEmail.style.display = 'contents'
+            errMsgEmail.textContent = "Ceci n'est pas un email.    (exemple: abc@hotmail.fr, abcde@gmail.com)"
+            return false
+        }
+}
+
+function addEventListenerToVerifieInputEmail() {
+    const inputEmail = document.getElementById('email')
+    inputEmail.addEventListener('change', isEmailValid)
+}
+
+
+/*Fonction permettant d'envoyer les données du formulaire stocker dans un objet "contact" et les ID des produit dans un array "products" vers l'API afin de recevoir
+une reponse de celle-ci puis de rediriger l'utilisateur vers la page confirmation dont l'url possede orderId donné par l'API , seulement si les conditions des 
+forumaile return true, sinon une alert 
+informeras l'utilisateur*/ 
+function sendInformation (event) {
+    const inputOrder = document.getElementById('order')
+        if(isFirstNameValid() && isLastNameValid() && isAdressValid() && isCityValid() && isEmailValid() ==  true) {
+            const dataCommand = { 
+                contact: {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    email: document.getElementById('email').value,
+                },
+                products: getIdsFromLS()
+            };
+            console.log(dataCommand);
+            fetch("http://localhost:3000/api/products/order", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataCommand)
+
+            })
+            .then(res => res.json())
+            .then  (function (data) {
+                console.log(data);
+                const str = window.location;
+                const url = new URL(str)
+                const urlConfirmationId = window.location.assign(`confirmation.html?id=${data.orderId}`)
+                console.log(url.href);
+            });
+            return true
+        } else {
+            alert('Veuillez remplir le formulaire correctement')
+            event.preventDefault();
+            return false;
+        }
+
+}
+
+//Fonction permettant d'appeler la fonction sendInformation au click de Commander
+function addEventListenerToSendInformation () {
+    const inputOrder = document.getElementById('order')
+    console.log(inputOrder);
+    inputOrder.addEventListener('click', sendInformation)
+}
+
+console.log(getProductsFromLS());
