@@ -1,11 +1,11 @@
-//nanana
-/*function clearLocalStorage () {
+//Fonction permettant de supprimer tout le Local Storage à la redirection.
+function clearLocalStorage() {
     localStorage.clear();
 }
-clearLocalStorage();*/
+clearLocalStorage();
 
-//nana
-function getWidowIdConfirmation () {
+//Fonction permettant d'obtenir le paramètre id dans l'URL
+function getWidowIdConfirmation() {
     const str = window.location;
     const url = new URL(str)
     const id = url.searchParams.get('id')
@@ -13,40 +13,17 @@ function getWidowIdConfirmation () {
 }
 console.log(getWidowIdConfirmation());
 
-//nana
-function extraireChiffre (str) {
-    return number = (str.replace(/[^\d]/g, ""))
+//Fonction permettant de suprimer tout les éléments qui ne sont pas des chiffres de l'id.
+function extraireChiffre(str) {
+    return number = (str.replace(/[^\d]/g, ""));
 }
 console.log(extraireChiffre(getWidowIdConfirmation()))
 
-//nanan
-function addCommandNumber () {
+//Fonction permettant d'ajouter le numéro de commande dans le DOM.
+function addCommandNumber() {
     const orderId = document.getElementById('orderId');
     const commandeNumber = extraireChiffre(getWidowIdConfirmation());
     const appendNumber = orderId.append(commandeNumber)
-   return commandeNumber
+    return commandeNumber
 }
 addCommandNumber();
-/*function test () {
-    return  window.location.assign(`confirmation.html?=on`)
-}
-/*console.log(test());
-const timeOut = setTimeout(test(), 5000)
-//console.log(timeOut);*/
-
-function deletHistory () {
-    localStorage.clear();
-    //window.history.replaceState("", "", `https://www.dofus.com/fr/prehome`);
-    //const state = {page_confirmation: `confirmation.html?id=${getWidowIdConfirmation()}`}
-    //window.history.pushState("", "", 'https://www.dofus.com/fr/prehome');
-    window.location.replace('confirmation.html');
-}
-
-window.addEventListener('unload', function(e) {
-    //localStorage.clear();
-    //window.location.replace(`cart.html`);
-    deletHistory();
-    //window.history.pushState("", "", 'confirmation.html');
-    //window.history.replaceState("", "", 'confirmation.html');
-})
-
